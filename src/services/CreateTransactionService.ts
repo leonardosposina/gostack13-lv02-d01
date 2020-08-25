@@ -1,5 +1,5 @@
-import TransactionsRepository from '../repositories/TransactionsRepository';
 import Transaction from '../models/Transaction';
+import TransactionsRepository from '../repositories/TransactionsRepository';
 
 class CreateTransactionService {
   private transactionsRepository: TransactionsRepository;
@@ -8,8 +8,18 @@ class CreateTransactionService {
     this.transactionsRepository = transactionsRepository;
   }
 
-  public execute(): Transaction {
-    // TODO
+  public execute({ title, value, type }: Omit<Transaction, 'id'>): Transaction {
+    const balance = this.transactionsRepository.getBalance();
+
+    if (balance.outcome && balance.total - value < 0)
+      throw Error('This transaction is invalid. No funds!');
+
+    const transaction = this.transactionsRepository.create({
+      title,
+      value,
+      type,
+    });
+    return transaction;
   }
 }
 

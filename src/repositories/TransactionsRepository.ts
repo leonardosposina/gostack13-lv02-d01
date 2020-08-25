@@ -13,16 +13,30 @@ class TransactionsRepository {
     this.transactions = [];
   }
 
-  public all(): Transaction[] {
-    // TODO
+  public all(): { transactions: Transaction[]; balance: Balance } {
+    const balance = this.getBalance();
+    return { transactions: this.transactions, balance };
   }
 
   public getBalance(): Balance {
-    // TODO
+    const incomeSum = this.transactions.reduce((accumulator, item) => {
+      return item.type === 'income' ? accumulator + item.value : accumulator;
+    }, 0);
+    const outcomeSum = this.transactions.reduce((accumulator, item) => {
+      return item.type === 'outcome' ? accumulator + item.value : accumulator;
+    }, 0);
+    const balance: Balance = {
+      income: incomeSum,
+      outcome: outcomeSum,
+      total: incomeSum - outcomeSum,
+    };
+    return balance;
   }
 
-  public create(): Transaction {
-    // TODO
+  public create({ title, value, type }: Omit<Transaction, 'id'>): Transaction {
+    const transaction = new Transaction({ title, value, type });
+    this.transactions.push(transaction);
+    return transaction;
   }
 }
 
