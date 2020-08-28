@@ -9,9 +9,9 @@ class CreateTransactionService {
   }
 
   public execute({ title, value, type }: Omit<Transaction, 'id'>): Transaction {
-    const balance = this.transactionsRepository.getBalance();
+    const { total } = this.transactionsRepository.getBalance();
 
-    if (balance.outcome && balance.total - value < 0)
+    if (type === 'outcome' && total - value < 0)
       throw Error('This transaction is invalid. No funds!');
 
     const transaction = this.transactionsRepository.create({
